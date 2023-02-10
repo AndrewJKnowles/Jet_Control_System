@@ -1,7 +1,7 @@
 #ifndef SERVO_H
 #define SERVO_H
 
-#include "mbed"
+#include "mbed.h"
 
 class Parallax{
 public:
@@ -11,7 +11,10 @@ public:
     //delete object
     ~Parallax();
 
+    //initialise device
     void init();
+
+    void move();
 
 private:
     PwmOut *_pwm;
