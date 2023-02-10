@@ -24,8 +24,13 @@ public:
     //initalise device
     void init();
 
-    void motorOn(DIRECTION const Dir);
+    //test operation of motor
+    void test();
 
+    //turn motor. Takes a float 0.0 -> 1.0 acting as duty cycle and direction
+    void motorOn(float duty, DIRECTION const Dir);
+
+    //stops motor operation
     void stop();
 
 private:
