@@ -16,7 +16,8 @@ class MD10C{
 public:
 
     //create object
-    MD10C(PinName const dir, PinName const PWM);
+    //take direction pin and read analog input to control motor speed
+    MD10C(PinName const dir, PinName const PWM, PinName const AnIn);
 
     //delete object
     ~MD10C();
@@ -28,7 +29,7 @@ public:
     void test();
 
     //turn motor. Takes a float 0.0 -> 1.0 acting as duty cycle and direction
-    void motorOn(float duty, DIRECTION const Dir);
+    void motorOn(DIRECTION const Dir);
 
     //stops motor operation
     void stop();
@@ -36,6 +37,9 @@ public:
 private:
     DigitalOut *_dir;
     PwmOut *_pwm;
+    AnalogIn *_anIn;
+
+    float an_read = 0.0;
 
 };
 

@@ -18,5 +18,5 @@ void Parallax::init(){
 }
 
 void Parallax::move(){
-    _pwm->write(0.5f);    //set to 6.4% duty cycle
+    _pwm->write(0.05f);    //set to 6.4% duty cycle
 }
