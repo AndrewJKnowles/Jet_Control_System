@@ -7,11 +7,6 @@
 #define CLOCKWISE 1
 #define ANTICLOCKWISE 0 
 
-enum DIRECTION{
-    clockwise,
-    anticlockwise,
-};
-
 class MD10C{
 public:
 
@@ -28,8 +23,8 @@ public:
     //test operation of motor
     void test();
 
-    //turn motor. Takes a float 0.0 -> 1.0 acting as duty cycle and direction
-    void motorOn(DIRECTION const Dir);
+    //turn motor. Takes direction
+    void motorOn(int direction);
 
     //stops motor operation
     void stop();
