@@ -21,8 +21,10 @@
 class MD10C{
 public:
 
-    //create object
-    //take direction pin and read analog input to control motor speed
+    /*create object
+    *Take direction pin and read analog input to control motor speed
+    *NOTE: the analogue pin is controlled by an external pot and is not a funtionality 
+    *of the motor driver itself */
     MD10C(PinName const dir, PinName const PWM, PinName const AnIn);
 
     //delete object

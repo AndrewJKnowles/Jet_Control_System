@@ -33,17 +33,17 @@ void MD10C::init(){
 
 void MD10C::test(){
     for(int i = 0; i < 3; i++){
+        //test clockwise functionality
         motorOn(1);
-        ThisThread::sleep_for(1s);
-
+        wait_us(500000);
         stop();
-        ThisThread::sleep_for(1s);
+        wait_us(500000);
 
+        //test anti clockwise functionality
         motorOn(0);
-        ThisThread::sleep_for(1s);
-
+        wait_us(500000);
         stop();
-        ThisThread::sleep_for(1s);
+        wait_us(500000);
     }
 }
 
