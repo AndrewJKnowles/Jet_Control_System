@@ -15,8 +15,8 @@
 PwmIn::PwmIn(PinName pwm)
                 : _pwm(pwm){
 
-                _pwm.rise(&PwmIn::rise);
-                _pwm.fall(&PwmIn::fall);
+                _pwm.rise(callback(this, &PwmIn::rise));
+                _pwm.fall(callback(this, &PwmIn::fall));
                 _period = 0.0;
                 _pulseWidth = 0.0;
                 _timer.start();
