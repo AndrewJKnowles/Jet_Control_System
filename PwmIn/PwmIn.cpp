@@ -1,3 +1,14 @@
+/*  PwmIn
+*   =====
+*   Library to calculate the period and duty cycle of an incoming PWM signal
+*
+*   Author:         Andrew Knowles 17/02/2023
+*   Version:        1.0
+*   Last updated:   17/02/2023
+*   MBED OS:        6.16.0
+*   MBED Studio:    v1.4.4
+*/
+
 #include "PwmIn.h"
 #include <chrono>
 
