@@ -1,3 +1,14 @@
+/*  MD10C
+*   =====
+*   Driver file for the Crytron MD10C Rev 2.0 motor driver
+*
+*   Author:         Andrew Knowles 17/02/2023
+*   Version:        1.0
+*   Last updated:   17/02/2023
+*   MBED OS:        6.16.0
+*   MBED Studio:    v1.4.4
+*/
+
 #ifndef MD10C_H
 #define MD10C_H
 
