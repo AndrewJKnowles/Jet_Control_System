@@ -87,6 +87,7 @@ void manualOperation(){
     //wait for confirmation that pot is set to 0
     do{
         pc.read(input, sizeof(input));
+        ThisThread::sleep_for(20ms);
     }while(*input != 'y' || *input != 'Y');
 
     pc.write(manual2, sizeof(manual2));
@@ -106,6 +107,7 @@ void manualOperation(){
 
         }
 
+        ThisThread::sleep_for(20ms);
     }while(*input != 'x' || *input != 'X');
 
     pc.write(manual3, sizeof(manual3));
