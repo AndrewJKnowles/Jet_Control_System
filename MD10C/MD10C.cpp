@@ -61,8 +61,8 @@ void MD10C::motorOn(DIRECTION const direction, float cycle){
     //check speed is valid
     if(cycle <= 0.0){
         cycle = 0.0;
-    }else if(cycle >= 0.25){
-        cycle = 0.25;
+    }else if(cycle >= 1.0){
+        cycle = 1.0;
     };
 
     _pwm->write(cycle); //write duty cycle 
@@ -84,8 +84,8 @@ void MD10C::manualMode(DIRECTION const direction){
 
     if(an_read <= 0.001){           //check analogue reading is within range
         an_read = 0.0;
-    }else if(an_read >= 0.23){      //max actuator duty cycle 25%
-        an_read = 0.23;
+    }else if(an_read >= 0.999){      //max actuator duty cycle 25%
+        an_read = 0.999;
     }
 
     _pwm->write(an_read);           //write analogue reading as pwm duty cycle
