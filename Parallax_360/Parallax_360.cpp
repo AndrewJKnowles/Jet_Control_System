@@ -62,7 +62,7 @@ void Parallax_360::clockwise(Speed const speed){
     if(speed == SLOW){
         _pwm->write(0.072f);   //duty cycle set to 7.2% 
     }else if(speed == MEDIUM){
-        _pwm->write(0.069f);    //set futy cycle to 6.9% for 70rpm approx.
+        _pwm->write(0.069f);    //set duty cycle to 6.9% for 70rpm approx.
     }else if(speed == FAST){
         _pwm->write(0.064f);    //set duty cycle to 6.4% for 140rpm approx.
     }

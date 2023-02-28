@@ -15,8 +15,13 @@
 #include "mbed.h"
 
 //rotation of shaft determined when looking at the motor from the direction of the shaft
-#define CLOCKWISE 1
-#define ANTICLOCKWISE 0 
+#define RETRACT 1
+#define EXTEND 0 
+
+enum DIRECTION {
+    EXTENSION,
+    RETRACTION
+};
 
 class MD10C{
 public:
@@ -37,7 +42,10 @@ public:
     void test();
 
     //turn motor. Takes direction
-    void motorOn(int direction);
+    void motorOn(DIRECTION const direction, float cycle);
+
+    //operate actuator in manual mode
+    void manualMode(DIRECTION const direction);
 
     //stops motor operation
     void stop();
@@ -48,7 +56,6 @@ private:
     AnalogIn *_anIn;
 
     float an_read = 0.0;
-
 };
 
 #endif

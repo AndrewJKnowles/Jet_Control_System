@@ -26,42 +26,66 @@ MD10C::~MD10C(){
 }
 
 void MD10C::init(){
-    _pwm->period_ms(1.0f);      //initialise pwm frequency to 1KHz
+    _pwm->period_ms(1.0f);      //initialise pwm frequency to 1KHz !!check frequency of actuator!!
     stop();                     //ensure the motor is off
-    _dir->write(CLOCKWISE);     //default direction
+    _dir->write(EXTEND);     //default direction
 }
 
 void MD10C::test(){
     for(int i = 0; i < 3; i++){
         //test clockwise functionality
-        motorOn(1);
-        wait_us(500000);
+        motorOn(EXTENSION, 0.1);
+        wait_us(3000000);
         stop();
-        wait_us(500000);
+        wait_us(3000000);
 
         //test anti clockwise functionality
-        motorOn(0);
-        wait_us(500000);
+        motorOn(RETRACTION, 0.1);
+        wait_us(3000000);
         stop();
-        wait_us(500000);
+        wait_us(3000000);
     }
 }
 
-void MD10C::motorOn(int direction){
-    if(direction == 1){                //set direction of motor
-        _dir->write(CLOCKWISE);
-    }else if(direction == 0){
-        _dir->write(ANTICLOCKWISE);
+void MD10C::motorOn(DIRECTION const direction, float cycle){
+    if(direction == RETRACTION){                //set direction of motor
+        _dir->write(RETRACT);
+
+    }else if(direction == EXTENSION){
+        _dir->write(EXTEND);
+
     }else{
         printf("ERROR >> Unspecified Motor Direction <<");
     }
 
-    an_read = _anIn->read();
+    //check speed is valid
+    if(cycle <= 0.0){
+        cycle = 0.0;
+    }else if(cycle >= 0.25){
+        cycle = 0.25;
+    };
+
+    _pwm->write(cycle); //write duty cycle 
+
+}
+
+void MD10C::manualMode(DIRECTION const direction){
+    if(direction == RETRACTION){                //set direction of motor
+        _dir->write(RETRACT);
+
+    }else if(direction == EXTENSION){
+        _dir->write(EXTEND);
+
+    }else{
+        printf("ERROR >> Unspecified Motor Direction <<");
+    }
+
+    an_read = _anIn->read();    //take pot reading
 
     if(an_read <= 0.001){           //check analogue reading is within range
         an_read = 0.0;
-    }else if(an_read >= 0.999){
-        an_read = 1.0;
+    }else if(an_read >= 0.23){      //max actuator duty cycle 25%
+        an_read = 0.23;
     }
 
     _pwm->write(an_read);           //write analogue reading as pwm duty cycle

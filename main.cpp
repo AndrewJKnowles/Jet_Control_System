@@ -2,48 +2,57 @@
 #include "MD10C.h"
 #include "Parallax_360.h"
 
-BufferedSerial pc(USBTX, USBRX);
+MD10C motor(p20, p21, p19);
+Parallax_360 servo(p22, p23);
+BufferedSerial pc(USBTX, USBRX);        //establish serial communications between PC and NUCLEO
 
+char mainMenu[] = "Main Menu\n 1. Extrude Material\n 2. Fill Hopper\n 3. Retract Actuator\n 4. Retract Servo\n 5. Manual Operation\n 6. Set Duty Cyle\n";
+char error1[] = "Error: Invalid selection\n";
 char *input = new char[1];
+int *menuSelection;
 
-char mainMenu[] = "Select an option:\n 1. Extrude Material\n 2. Retract Bed\n 3. Retract Actuator\n 4. System Reset\n 5. Refill Hopper\n 6. Test Actuator\n 7. Test Servo\n";
-char message1[] = "Option 1";
-char message2[] = "Option 2";
-char message3[] = "Option 3";
-char message4[] = "Option 4";
-char message5[] = "Option 5";
-char message6[] = "Option 6";
-char message7[] = "Option 7";
+void initComms();
 
 int main(){
-    pc.set_baud(9600);
-    pc.write(mainMenu, sizeof(mainMenu));
+    initComms();
+
     while(1){
-        pc.read(input, sizeof(input));
+    pc.write(mainMenu, sizeof(mainMenu));
+    pc.read(menuSelection, sizeof(menuSelection));
 
-        if(*input == '1'){
-            pc.write(message1, sizeof(message1));
+        switch(*menuSelection){
+            case 1:
+                //extrude material
+                break;
 
-        }else if(*input == '2'){
-            pc.write(message2, sizeof(message2));
+            case 2:
+                //Fill hopper
+                break;
 
-        }else if(*input == '3'){
-            pc.write(message3, sizeof(message3));
+            case 3:
+                //Retract Actuator
+                break;
+            
+            case 4:
+                //Retract Servo
+                break;
 
-        }else if(*input == '4'){
-            pc.write(message4, sizeof(message4));
+            case 5:
+                //Manual Operation
+                break;
 
-        }else if(*input == '5'){
-            pc.write(message5, sizeof(message5));
+            case 6:
+                //set duty cycle
+                break;
 
-        }else if(*input == '6'){
-            pc.write(message6, sizeof(message6));
-
-        }else if(*input == '7'){
-            pc.write(message7, sizeof(message7));
-
-        }else{
-            printf(">> error invalid option");
+            default:
+                pc.write(error1, sizeof(error1));
+                break;
         }
     }
+}
+
+void initComms(){
+    pc.set_baud(9600);
+    pc.set_format(8, BufferedSerial::None, 1); //8-N-1
 }
