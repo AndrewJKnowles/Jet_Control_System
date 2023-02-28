@@ -22,6 +22,8 @@ void manualOperation();
 
 int main(){
     initComms();
+    motor.init();
+    servo.init();
 
     while(1){
         pc.write(mainMenu, sizeof(mainMenu));
@@ -101,7 +103,7 @@ void manualOperation(){
 
         }else{
             pc.write(error1, sizeof(error1));
-            
+
         }
 
     }while(*input != 'x' || *input != 'X');
