@@ -2,11 +2,16 @@
 #include "MD10C.h"
 #include "Parallax_360.h"
 
-MD10C motor(p20, p21, p19);
-Parallax_360 servo(p22, p23);
+/*MD10C motor(p20, p21, p19);
+Parallax_360 servo(p22, p23);*/ //for lpc use
+
+MD10C motor(PA_13, PA_15, PA_0);
+Parallax_360 servo(PB_7, PC_13);   //for nucleo use
+
+
 BufferedSerial pc(USBTX, USBRX);        //establish serial communications between PC and NUCLEO
 
-char mainMenu[] = "Main Menu\n 1. Extrude Material\n 2. Fill Hopper\n 3. Retract Actuator\n 4. Retract Servo\n 5. Manual Operation\n 6. Set Duty Cyle\n";
+char mainMenu[] = "Main Menu\n a. Extrude Material\n b. Fill Hopper\n c. Retract Actuator\n d. Retract Servo\n e. Manual Operation\n f. Set Duty Cyle\n";
 char retractingActuator[] = " Retracting Actuator...   To stop Press 'X'\n ";
 char retractionStopped[] =  "Retraction Stopped\n";
 char manual[] = "Manual mode: Ensure Pot is initially set to 0\n Press 'Y' to confirm\n";
@@ -14,7 +19,6 @@ char manual2[] = "Entering manual mode:\n Use 'E' to extend and 'R' to retract t
 char manual3[] = "Exiting manual mode\n";
 char error1[] = "Error: Invalid selection\n";
 char *input = new char[1];
-int *menuSelection;
 
 void initComms();
 void retractActuator();
@@ -27,32 +31,32 @@ int main(){
 
     while(1){
         pc.write(mainMenu, sizeof(mainMenu));
-        pc.read(menuSelection, sizeof(menuSelection));
+        pc.read(input, sizeof(input));
 
-        switch(*menuSelection){
-            case 1:
+        switch(*input){
+            case 'a':
                 //extrude material
                 break;
 
-            case 2:
+            case 'b':
                 //Fill hopper
                 break;
 
-            case 3:
+            case 'c':
                 //Retract Actuator
                 retractActuator();
                 break;
             
-            case 4:
+            case 'd':
                 //Retract Servo
                 break;
 
-            case 5:
+            case 'e':
                 //Manual Operation
                 manualOperation();
                 break;
 
-            case 6:
+            case 'f':
                 //set duty cycle
                 break;
 
