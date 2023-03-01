@@ -18,6 +18,9 @@ char manual[] = "Manual mode: Ensure Pot is initially set to 0\n Press 'Y' to co
 char manual2[] = "Entering manual mode:\n Use 'E' to extend and 'R' to retract the actuator\n Press 'X' to exit\n";
 char manual3[] = "Exiting manual mode\n";
 char error1[] = "Error: Invalid selection\n";
+
+char general[] = " In Loop\n";
+
 char *input = new char[1];
 
 void initComms();
@@ -73,12 +76,15 @@ void initComms(){
 }
 
 void retractActuator(){
-    pc.write(retractingActuator, sizeof(retractingActuator));
+    pc.write(retractingActuator, sizeof(retractingActuator));   //general message output
 
     do{
-        pc.read(input, sizeof(input));
-        motor.motorOn(RETRACTION, 0.25);
+        pc.read(input, sizeof(input));      //read input
+        motor.motorOn(RETRACTION, 0.10);    //turn actuator on with 10% duty cycle
         ThisThread::sleep_for(20ms);
+
+        pc.write(general, sizeof(general)); //debug statement
+
     }while(*input != 'x' || *input != 'X'); //retract actuator while stop command is not given
 
     pc.write(retractionStopped, sizeof(retractionStopped));
