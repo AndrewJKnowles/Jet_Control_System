@@ -2,11 +2,13 @@
 #include "MD10C.h"
 #include "Parallax_360.h"
 
-/*MD10C motor(p20, p21, p19);
-Parallax_360 servo(p22, p23);*/ //for lpc use
+          //dir, PWM, AnIn
+MD10C motor(p24, p23, p20);
+                  //PWM, pos
+Parallax_360 servo(p25, p26); //for lpc use
 
-MD10C motor(PA_13, PA_15, PA_0);
-Parallax_360 servo(PB_7, PC_13);   //for nucleo use
+/*MD10C motor(PA_13, PA_15, PA_0);
+Parallax_360 servo(PB_7, PC_13);   //for nucleo use*/
 
 
 BufferedSerial pc(USBTX, USBRX);        //establish serial communications between PC and NUCLEO
@@ -37,6 +39,8 @@ char set3[] = "\n\nSet new duty cycle: ";
 char set4[] = "\n\nNew duty cycle value is: ";
 
 char error1[] = "Error: Invalid selection\n\n";
+char error2[] = "Error: Duty Cycle set to minimum\n\n";
+char error3[] = "Error: Duty Cycle set to maximum\n\n";
 
 char *input = new char[1];
 
@@ -172,10 +176,10 @@ void manualOperation(){
             pc.write(manual4, sizeof(manual4));     //print general message
             motor.manualMode(EXTENSION);
 
-        }else if(*input == 'p' || *input == 'P'){   //if input == p, pause actuator motion
+        }else if(*input == 't' || *input == 'T'){   //if input == p, pause actuator motion
             pc.write(manual6, sizeof(manual6));     //print general message
-            pc.write(dutymess, sizeof(dutymess));   
-            pc.write(doubleReturn, sizeof(doubleReturn));   //Display current duty cycle
+            pc.write(dutymess, sizeof(dutymess));   //Display current duty cycle
+            pc.write(doubleReturn, sizeof(doubleReturn));   
             motor.stop();
 
         }else if(*input == 'x' || *input == 'X'){   //check for valid exit character
@@ -192,7 +196,7 @@ void manualOperation(){
 
 //option E
 void setDuty(){
-    char buffer[32];
+    /*char buffer[32];
     float Newdutycycle;
     float set2;
 
@@ -216,7 +220,7 @@ void setDuty(){
         if(*input == 'x' || *input == 'X'){     //check for valid exit character
             inputConfirmation = true;           //set valid input to true
         }
-    }
+    }*/
 }
 
 /*//option F messages
