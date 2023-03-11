@@ -11,15 +11,21 @@ Parallax_360 servo(PB_7, PC_13);   //for nucleo use
 
 BufferedSerial pc(USBTX, USBRX);        //establish serial communications between PC and NUCLEO
 
-char mainMenu[] = "Main Menu\n a. Extrude Material\n b. Fill Hopper\n c. Retract Actuator\n d. Retract Servo\n e. Manual Operation\n f. Set Duty Cyle\n\n";
+char mainMenu[] = "Main Menu\n a. Extrude Material\n b. Retract Actuator\n c. Retract Servo\n d. Manual Operation\n e. Set Duty Cyle\n\n";
+
+//option A messages
+char ext1[] = "Extrude material\nPress 'X' to exit\n\n";
+char ext2[] = "Extruding...\n\n";
+char ext3[] = "Extrusion stopped\n\n";
 
 //option C messages
-char retractingActuator[] = " Retracting Actuator...   To stop Press 'X'\n\n";
+char retractingActuator[] = "Actuator Retraction\nPress 'X' to exit\n\n";
+char retracting[] = "Retracting...\n\n";
 char retractionStopped[] =  "Retraction Stopped\n\n";
 
 //option E messages
 char manual[] = "Manual mode: Ensure Pot is initially set to 0\n Press 'Y' to confirm\n\n";
-char manual2[] = "Entering manual mode:\n Use 'E' to extend\n Use 'R' to retract the actuator\n Use 'P' to pause actuator motion\n Press 'X' to exit\n\n";
+char manual2[] = "Entering manual mode:\n Use 'E' to extend the actuator\n Use 'R' to retract the actuator\n Use 'P' to pause actuator motion\n Press 'X' to exit\n\n";
 char manual3[] = "Exiting manual mode...\n\n";
 char manual4[] = "Extending Actuator...\n\n";
 char manual5[] = "Retracting actuator...\n\n";
@@ -37,6 +43,7 @@ char *input = new char[1];
 bool inputConfirmation = false;
 
 void initComms();
+void extrude();
 void retractActuator();
 void manualOperation();
 void setDuty();
@@ -53,27 +60,24 @@ int main(){
         switch(*input){
             case 'a':
                 //extrude material
+                extrude();
                 break;
 
             case 'b':
-                //Fill hopper
-                break;
-
-            case 'c':
                 //Retract Actuator
                 retractActuator();
                 break;
             
-            case 'd':
+            case 'c':
                 //Retract Servo
                 break;
 
-            case 'e':
+            case 'd':
                 //Manual Operation
                 manualOperation();
                 break;
 
-            case 'f':
+            case 'e':
                 //set duty cycle
                 setDuty();
                 break;
@@ -92,12 +96,32 @@ void initComms(){
 }
 
 //option A
+void extrude(){
+    pc.write(ext1, sizeof(ext1));
+    ThisThread::sleep_for(500ms);
+    pc.write(ext2, sizeof(ext2));
+
+    motor.motorOn(EXTENSION);
+
+    while(inputConfirmation == false){          //while input != x or X
+        pc.read(input, sizeof(input));          //read input
+
+        if(*input == 'x' || *input == 'X'){     //check for valid exit character
+            inputConfirmation = true;           //set valid input to true
+        }
+    }
+
+    motor.stop();
+    inputConfirmation = false;
+    pc.write(ext3, sizeof(ext3));
+    ThisThread::sleep_for(500ms);
+}
 
 //option B
-
-//option C
 void retractActuator(){
     pc.write(retractingActuator, sizeof(retractingActuator));   //general message output
+    ThisThread::sleep_for(500ms);
+    pc.write(retracting, sizeof(retracting));
 
     while(inputConfirmation == false){          //while input != x or X
         motor.motorOn(RETRACTION);        //turn actuator on with 10% duty cycle
@@ -114,9 +138,9 @@ void retractActuator(){
     ThisThread::sleep_for(500ms);               
 }
 
-//option D
+//option C
 
-//option E
+//option D
 void manualOperation(){
     char dutyValue[1];
     char dutymess[] = "The current duty cyle is: ";
@@ -142,20 +166,16 @@ void manualOperation(){
 
         if(*input == 'r' || *input == 'R'){     //if input == r, retract actuator
             pc.write(manual5, sizeof(manual5)); //print general message
-            pc.write(dutymess, sizeof(dutymess));
-            pc.write(doubleReturn, sizeof(doubleReturn));
             motor.manualMode(RETRACTION);
 
         }else if(*input == 'e' || *input == 'E'){   //if input == e, extend actuator
             pc.write(manual4, sizeof(manual4));     //print general message
-            pc.write(dutymess, sizeof(dutymess));
-            pc.write(doubleReturn, sizeof(doubleReturn));
             motor.manualMode(EXTENSION);
 
         }else if(*input == 'p' || *input == 'P'){   //if input == p, pause actuator motion
             pc.write(manual6, sizeof(manual6));     //print general message
-            pc.write(dutymess, sizeof(dutymess));
-            pc.write(doubleReturn, sizeof(doubleReturn));
+            pc.write(dutymess, sizeof(dutymess));   
+            pc.write(doubleReturn, sizeof(doubleReturn));   //Display current duty cycle
             motor.stop();
 
         }else if(*input == 'x' || *input == 'X'){   //check for valid exit character
@@ -170,7 +190,7 @@ void manualOperation(){
     ThisThread::sleep_for(500ms);
 }
 
-//option F
+//option E
 void setDuty(){
     char buffer[32];
     float Newdutycycle;
