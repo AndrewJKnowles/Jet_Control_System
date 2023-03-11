@@ -12,14 +12,19 @@ Parallax_360 servo(PB_7, PC_13);   //for nucleo use
 BufferedSerial pc(USBTX, USBRX);        //establish serial communications between PC and NUCLEO
 
 char mainMenu[] = "Main Menu\n a. Extrude Material\n b. Fill Hopper\n c. Retract Actuator\n d. Retract Servo\n e. Manual Operation\n f. Set Duty Cyle\n\n";
+
+//option C messages
 char retractingActuator[] = " Retracting Actuator...   To stop Press 'X'\n\n";
 char retractionStopped[] =  "Retraction Stopped\n\n";
+
+//option E messages
 char manual[] = "Manual mode: Ensure Pot is initially set to 0\n Press 'Y' to confirm\n\n";
 char manual2[] = "Entering manual mode:\n Use 'E' to extend\n Use 'R' to retract the actuator\n Use 'P' to pause actuator motion\n Press 'X' to exit\n\n";
 char manual3[] = "Exiting manual mode...\n\n";
 char manual4[] = "Extending Actuator...\n\n";
 char manual5[] = "Retracting actuator...\n\n";
 char manual6[] = "Actuation Paused\n\n";
+
 char error1[] = "Error: Invalid selection\n\n";
 
 char *input = new char[1];
