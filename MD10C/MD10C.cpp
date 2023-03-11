@@ -29,25 +29,26 @@ void MD10C::init(){
     _pwm->period_ms(1.0f);      //initialise pwm frequency to 1KHz !!check frequency of actuator!!
     stop();                     //ensure the motor is off
     _dir->write(EXTEND);     //default direction
+    duty_cycle = 0.1;
 }
 
 void MD10C::test(){
     for(int i = 0; i < 3; i++){
         //test clockwise functionality
-        motorOn(EXTENSION, 0.1);
+        motorOn(EXTENSION);
         wait_us(3000000);
         stop();
         wait_us(3000000);
 
         //test anti clockwise functionality
-        motorOn(RETRACTION, 0.1);
+        motorOn(RETRACTION);
         wait_us(3000000);
         stop();
         wait_us(3000000);
     }
 }
 
-void MD10C::motorOn(DIRECTION const direction, float cycle){
+void MD10C::motorOn(DIRECTION const direction){
     if(direction == RETRACTION){                //set direction of motor
         _dir->write(RETRACT);
 
@@ -58,14 +59,7 @@ void MD10C::motorOn(DIRECTION const direction, float cycle){
         printf("ERROR >> Unspecified Motor Direction <<");
     }
 
-    //check speed is valid
-    if(cycle <= 0.0){
-        cycle = 0.0;
-    }else if(cycle >= 1.0){
-        cycle = 1.0;
-    };
-
-    _pwm->write(cycle); //write duty cycle 
+    _pwm->write(duty_cycle); //write duty cycle 
 
 }
 
@@ -88,9 +82,27 @@ void MD10C::manualMode(DIRECTION const direction){
         an_read = 0.999;
     }
 
-    _pwm->write(an_read);           //write analogue reading as pwm duty cycle
+    duty_cycle = an_read;
+    
+    _pwm->write(duty_cycle);           //write analogue reading as pwm duty cycle
 }
 
 void MD10C::stop(){
     _pwm->write(0);                 //set duty cycle to 0%
+}
+
+void MD10C::setDutyCycle(float _duty){
+    //check speed is valid
+    if(_duty <= 0.0){
+        _duty = 0.0;
+    }else if(_duty >= 1.0){
+        _duty = 1.0;
+    };
+
+    duty_cycle = _duty;
+}
+
+float MD10C::getDutyCycle(){
+    float currentDutyCycle = duty_cycle;
+    return currentDutyCycle;
 }

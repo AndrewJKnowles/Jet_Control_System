@@ -42,7 +42,7 @@ public:
     void test();
 
     //turn motor. Takes direction
-    void motorOn(DIRECTION const direction, float cycle);
+    void motorOn(DIRECTION const direction);
 
     //operate actuator in manual mode
     void manualMode(DIRECTION const direction);
@@ -50,12 +50,19 @@ public:
     //stops motor operation
     void stop();
 
+    //set the duty cycle
+    void setDutyCycle(float _duty);
+
+    //get the current duty cycle
+    float getDutyCycle();
+
 private:
     DigitalOut *_dir;
     PwmOut *_pwm;
     AnalogIn *_anIn;
 
     float an_read = 0.0;
+    float duty_cycle;
 };
 
 #endif

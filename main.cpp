@@ -25,6 +25,11 @@ char manual4[] = "Extending Actuator...\n\n";
 char manual5[] = "Retracting actuator...\n\n";
 char manual6[] = "Actuation Paused\n\n";
 
+//option F messages
+char set1[] = "Set the Duty Cycle of the actuator\nThe current Duty Cycle value is: ";
+char set3[] = "\n\nSet new duty cycle: ";
+char set4[] = "\n\nNew duty cycle value is: ";
+
 char error1[] = "Error: Invalid selection\n\n";
 
 char *input = new char[1];
@@ -34,6 +39,7 @@ bool inputConfirmation = false;
 void initComms();
 void retractActuator();
 void manualOperation();
+void setDuty();
 
 int main(){
     initComms();
@@ -69,6 +75,7 @@ int main(){
 
             case 'f':
                 //set duty cycle
+                setDuty();
                 break;
 
             default:
@@ -93,7 +100,7 @@ void retractActuator(){
     pc.write(retractingActuator, sizeof(retractingActuator));   //general message output
 
     while(inputConfirmation == false){          //while input != x or X
-        motor.motorOn(RETRACTION, 0.10);        //turn actuator on with 10% duty cycle
+        motor.motorOn(RETRACTION);        //turn actuator on with 10% duty cycle
         pc.read(input, sizeof(input));          //read input
 
         if(*input == 'x' || *input == 'X'){     //check for valid exit character
@@ -111,6 +118,10 @@ void retractActuator(){
 
 //option E
 void manualOperation(){
+    char dutyValue[1];
+    char dutymess[] = "The current duty cyle is: ";
+    char doubleReturn[] = "\n\n";
+
     pc.write(manual, sizeof(manual));           //print general message
 
     //wait for confirmation that pot is set to 0
@@ -127,17 +138,24 @@ void manualOperation(){
 
     while(inputConfirmation == false){          //while input != x or X
         pc.read(input, sizeof(input));          //read input
+        dutyValue[0] = motor.getDutyCycle();
 
         if(*input == 'r' || *input == 'R'){     //if input == r, retract actuator
             pc.write(manual5, sizeof(manual5)); //print general message
+            pc.write(dutymess, sizeof(dutymess));
+            pc.write(doubleReturn, sizeof(doubleReturn));
             motor.manualMode(RETRACTION);
 
         }else if(*input == 'e' || *input == 'E'){   //if input == e, extend actuator
             pc.write(manual4, sizeof(manual4));     //print general message
+            pc.write(dutymess, sizeof(dutymess));
+            pc.write(doubleReturn, sizeof(doubleReturn));
             motor.manualMode(EXTENSION);
 
         }else if(*input == 'p' || *input == 'P'){   //if input == p, pause actuator motion
             pc.write(manual6, sizeof(manual6));     //print general message
+            pc.write(dutymess, sizeof(dutymess));
+            pc.write(doubleReturn, sizeof(doubleReturn));
             motor.stop();
 
         }else if(*input == 'x' || *input == 'X'){   //check for valid exit character
@@ -153,3 +171,36 @@ void manualOperation(){
 }
 
 //option F
+void setDuty(){
+    char buffer[32];
+    float Newdutycycle;
+    float set2;
+
+    char* floatInput = buffer;
+
+    set2 = motor.getDutyCycle();
+    buffer[0] = set2;
+
+    pc.write(set1, sizeof(set1));   //general message output
+    pc.write(buffer, sizeof(buffer));   //print current duty cycle
+    pc.write(set3, sizeof(set3));   //general message output
+
+    Newdutycycle = pc.read(floatInput, sizeof(floatInput));
+
+    pc.write(set4, sizeof(set4));
+    pc.write(buffer, sizeof(buffer));
+
+    while(inputConfirmation == false){          //while input != x or X
+        pc.read(input, sizeof(input));
+
+        if(*input == 'x' || *input == 'X'){     //check for valid exit character
+            inputConfirmation = true;           //set valid input to true
+        }
+    }
+}
+
+/*//option F messages
+char set1[] = "Set the Duty Cycle of the actuator\nThe current Duty Cycle value is: ";
+char set2[1];    //use to read the current value of the duty cycle value
+char set3[] = "\n\nSet new duty cycle: ";
+char set4[] = "\n\nNew duty cycle value is: ";*/
