@@ -1,11 +1,14 @@
 #include "mbed.h"
 #include "MD10C.h"
-#include "Parallax_360.h"
+//#include "Parallax_360.h"
+#include "Parallax_180.h"
 
+//for lpc use
           //dir, PWM, AnIn
 MD10C motor(p24, p23, p20);
                   //PWM, pos
-Parallax_360 servo(p25, p26); //for lpc use
+//Parallax_360 servo(p25, p26); 
+Parallax_180 servo(p25);
 
 /*MD10C motor(PA_13, PA_15, PA_0);
 Parallax_360 servo(PB_7, PC_13);   //for nucleo use*/
@@ -74,6 +77,7 @@ int main(){
             
             case 'c':
                 //Retract Servo
+                servo.test();
                 break;
 
             case 'd':

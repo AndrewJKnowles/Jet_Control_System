@@ -26,7 +26,8 @@ MD10C::~MD10C(){
 }
 
 void MD10C::init(){
-    _pwm->period_ms(1.0f);      //initialise pwm frequency to 1KHz !!check frequency of actuator!!
+    //_pwm->period_ms(1.0f);      //initialise pwm frequency to 1KHz
+    _pwm->period_us(67);        //initialise pwm frequency to 15KHz
     stop();                     //ensure the motor is off
     _dir->write(EXTEND);     //default direction
     duty_cycle = 0.9;
