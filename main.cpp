@@ -1,3 +1,8 @@
+/* max_limit_isr is being triggered as confirmed by the activation of the on board LED, however the while loop within
+* extrude() is not being exited by the flag being set. the variable g_max_limit is being set as confirmed by the resetting of the LED upon 
+* exiting the whilke loop using key input 'x'. */
+
+
 #include "mbed.h"
 #include "MD10C.h"
 //#include "Parallax_360.h"
@@ -10,8 +15,10 @@ MD10C motor(p24, p23, p20);
 //Parallax_360 servo(p25, p26); 
 Parallax_180 servo(p25);
 BufferedSerial pc(USBTX, USBRX);        //establish serial communications between PC and NUCLEO
-InterruptIn max_limit_switch(p21);
+InterruptIn max_limit_switch(p11);
 InterruptIn min_limit_switch(p22);
+DigitalOut LED_max(LED1);
+DigitalOut LED_min(LED2);
 
 char mainMenu[] = "Main Menu\n a. Extrude Material\n b. Retract Actuator\n c. Retract Servo\n d. Manual Operation\n e. Set Duty Cyle\n\n";
 
@@ -46,6 +53,8 @@ char *input = new char[1];
 
 volatile int g_max_limit = 0;
 volatile int g_min_limit = 0;
+
+
 bool inputConfirmation = false;
 
 void max_limit_isr();
@@ -63,8 +72,11 @@ int main(){
     max_limit_switch.mode(PullUp);
     min_limit_switch.mode(PullUp);
 
-    max_limit_switch.fall(&max_limit_isr);
+    LED_max = 0;
+    LED_min = 0;
+
     min_limit_switch.fall(&min_limit_isr);
+    max_limit_switch.fall(&max_limit_isr);
 
     while(1){
         pc.write(mainMenu, sizeof(mainMenu));
@@ -111,12 +123,13 @@ void initComms(){
 
 void max_limit_isr(){
     g_max_limit = 1;
+    LED_max = 1;
 }
 
 void min_limit_isr(){
     g_min_limit = 1;
+    //LED_min = 1;
 }
-
 //option A
 void extrude(){
     pc.write(ext1, sizeof(ext1));
@@ -125,18 +138,22 @@ void extrude(){
 
     motor.motorOn(EXTENSION);                                       //extend actuator
 
-    while(inputConfirmation == false || g_max_limit == 1){          //while input != x or X || g_max_limit has been reached
+    while(inputConfirmation == false){                              //while input != x or X || g_max_limit has been reached
         pc.read(input, sizeof(input));                              //read input
 
-        if(*input == 'x' || *input == 'X'){                         //check for valid exit character
+        if(*input == 'x' || *input == 'X'){     //check for valid exit character *input == 'x' || *input == 'X' ||
             inputConfirmation = true;                               //set valid input to true
+
+        }else if(g_max_limit == 1){
+            inputConfirmation = true;
         }
     }
 
     /* implement function to retract actuator slightly to reset switch */
 
     if(g_max_limit == 1){
-        g_max_limit = 0;                                            //reset g_max_limit flag
+        g_max_limit = 0; 
+        LED_max = 0;                                           //reset g_max_limit flag
     }
 
     motor.stop();                                                   //stop actuation
@@ -151,19 +168,13 @@ void retractActuator(){
     ThisThread::sleep_for(500ms);
     pc.write(retracting, sizeof(retracting));
 
-    while(inputConfirmation == false || g_min_limit == 1){          //while input != x or X || g_min_limit has been reached
+    while(inputConfirmation == false){          //while input != x or X || g_min_limit has been reached
         motor.motorOn(RETRACTION);                                  //turn actuator on with 10% duty cycle
         pc.read(input, sizeof(input));                              //read input
 
         if(*input == 'x' || *input == 'X'){                         //check for valid exit character
             inputConfirmation = true;                               //set valid input to true
         }
-    }
-
-    /* implement function to extend actuator slightly to reset switch */
-
-    if(g_min_limit == 1){
-        g_min_limit = 0;                                            //reset g_min_limit flag
     }
 
     inputConfirmation = false;                                      //reset input flag
@@ -211,14 +222,6 @@ void manualOperation(){
             pc.write(dutymess, sizeof(dutymess));   //Display current duty cycle
             pc.write(doubleReturn, sizeof(doubleReturn));   
             motor.stop();
-
-        }else if(g_min_limit == 1){
-            //extend actuator slightly to reset switch
-            //reset flag
-
-        }else if(g_max_limit == 1){
-            //retract actuator slightly to reset switch
-            //reset flag
 
         }else if(*input == 'x' || *input == 'X'){   //check for valid exit character
             inputConfirmation = true;               //set valid input to true

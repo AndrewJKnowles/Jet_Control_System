@@ -29,7 +29,7 @@ void Parallax_180::test(){
     
     for(int i = 0; i < 3; i++){
         move(0.053);    //move to 45 degrees
-        move(0.076);    //move to 90 degrees
+        //move(0.076);    //move to 90 degrees
         move(0.03);     //move to 0 degrees
         
         ThisThread::sleep_for(100ms);
