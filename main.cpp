@@ -60,23 +60,14 @@ bool inputConfirmation = false;
 void max_limit_isr();
 void min_limit_isr();
 void initComms();
+void systemInit();
 void extrude();
 void retractActuator();
 void manualOperation();
 void setDuty();
 
 int main(){
-    initComms();
-    motor.init();
-    servo.init();
-    max_limit_switch.mode(PullUp);
-    min_limit_switch.mode(PullUp);
-    max_limit_switch.fall(&max_limit_isr);
-    min_limit_switch.fall(&min_limit_isr);
-
-    LED_max = 0;
-    LED_min = 0;
-    led4 = 0;
+    systemInit();
 
     while(1){
         pc.write(mainMenu, sizeof(mainMenu));
@@ -86,11 +77,13 @@ int main(){
             case 'a':
                 //extrude material
                 extrude();
+                g_max_limit = 0;    //reset g_max_limit flag
                 break;
 
             case 'b':
                 //Retract Actuator
                 retractActuator();
+                g_min_limit = 0;    //reset g_min_limit flag
                 break;
             
             case 'c':
@@ -115,73 +108,76 @@ int main(){
     }
 }
 
+//max limit ISR
+void max_limit_isr(){
+    g_max_limit = 1;
+}
+
+//min limit ISR
+void min_limit_isr(){
+    g_min_limit = 1;
+}
+
 //init comms protocols
 void initComms(){
     pc.set_baud(9600);
     pc.set_format(8, BufferedSerial::None, 1); //8-N-1
 }
 
-void max_limit_isr(){
-    g_max_limit = 1;
-    LED_max = 1;
-}
-
-void min_limit_isr(){
-    g_min_limit = 1;
-    //LED_min = 1;
+//init system
+void systemInit(){
+    initComms();                                //init comms protocols
+    motor.init();                               //init actuator
+    servo.init();                               //init servo
+    max_limit_switch.mode(PullUp);              //set weak pull up
+    min_limit_switch.mode(PullUp);              //set weak pull up
+    max_limit_switch.fall(&max_limit_isr);      //generate callback upon voltage drop
+    min_limit_switch.fall(&min_limit_isr);      //generate callback upon voltage drop
 }
 
 //option A
 void extrude(){
-    pc.set_blocking(false);
-
-    pc.write(ext1, sizeof(ext1));
+    pc.set_blocking(false);                                         //disable serial blocking status
+    pc.write(ext1, sizeof(ext1));                                   //display general message
     ThisThread::sleep_for(500ms);
-    pc.write(ext2, sizeof(ext2));
-
+    pc.write(ext2, sizeof(ext2));                                   //display general message
     motor.motorOn(EXTENSION);                                       //extend actuator
 
-    while(inputConfirmation == false){                              //while input != x or X || g_max_limit has been reached
-        pc.read(input, sizeof(input));                              //read input
+    while(inputConfirmation == false){                              //while valid input is false
+        pc.read(input, sizeof(input));                              //read key input
 
-        if(*input == 'x' || *input == 'X'){                         //check for valid exit character *input == 'x' || *input == 'X' ||
+        if((*input == 'x' || *input == 'X') || g_max_limit == 1){   //check for valid exit character or limit has been reached
             inputConfirmation = true;                               //set valid input to true
         }
-        
-        if(g_max_limit == 1){     //THIS CONDITION ISNT BEING MET
-            inputConfirmation = true;
-        }
-    }
-
-    if(g_max_limit == 1){
-        g_max_limit = 0;                                               //reset g_max_limit flag
     }
 
     motor.stop();                                                   //stop actuation
     inputConfirmation = false;                                      //reset inputConfirmation flag
-    pc.set_blocking(true);
-    pc.write(ext3, sizeof(ext3));
+    pc.set_blocking(true);                                          //re-enable serial blocking status
+    pc.write(ext3, sizeof(ext3));                                   //display general message
     ThisThread::sleep_for(500ms);
 }
 
 //option B
 void retractActuator(){
-    pc.write(retractingActuator, sizeof(retractingActuator));       //general message output
+    pc.set_blocking(false);                                         //disable serial blocking status
+    pc.write(retractingActuator, sizeof(retractingActuator));       //display general message
     ThisThread::sleep_for(500ms);
-    pc.write(retracting, sizeof(retracting));
+    pc.write(retracting, sizeof(retracting));                       //display general message
+    motor.motorOn(RETRACTION);                                      //turn actuator on with 10% duty cycle
 
-    while(inputConfirmation == false){          //while input != x or X || g_min_limit has been reached
-        motor.motorOn(RETRACTION);                                  //turn actuator on with 10% duty cycle
-        pc.read(input, sizeof(input));                              //read input
+    while(inputConfirmation == false){                              //while valid input is false
+        pc.read(input, sizeof(input));                              //read key input
 
-        if(*input == 'x' || *input == 'X'){                         //check for valid exit character
+        if(*input == 'x' || *input == 'X' || g_min_limit == 1){     //check for valid exit character or limit has been reached
             inputConfirmation = true;                               //set valid input to true
         }
     }
 
-    inputConfirmation = false;                                      //reset input flag
-    pc.write(retractionStopped, sizeof(retractionStopped));         //print message
     motor.stop();                                                   //stop actuation
+    inputConfirmation = false;                                      //reset inputConfirmation flag
+    pc.set_blocking(true);                                          //re-enable serial blocking status
+    pc.write(retractionStopped, sizeof(retractionStopped));         //display general message      
     ThisThread::sleep_for(500ms);               
 }
 
