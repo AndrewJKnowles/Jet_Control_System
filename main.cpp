@@ -19,6 +19,7 @@ InterruptIn max_limit_switch(p11);
 InterruptIn min_limit_switch(p22);
 DigitalOut LED_max(LED1);
 DigitalOut LED_min(LED2);
+DigitalOut led4(LED4);
 
 char mainMenu[] = "Main Menu\n a. Extrude Material\n b. Retract Actuator\n c. Retract Servo\n d. Manual Operation\n e. Set Duty Cyle\n\n";
 
@@ -54,7 +55,6 @@ char *input = new char[1];
 volatile int g_max_limit = 0;
 volatile int g_min_limit = 0;
 
-
 bool inputConfirmation = false;
 
 void max_limit_isr();
@@ -71,12 +71,12 @@ int main(){
     servo.init();
     max_limit_switch.mode(PullUp);
     min_limit_switch.mode(PullUp);
+    max_limit_switch.fall(&max_limit_isr);
+    min_limit_switch.fall(&min_limit_isr);
 
     LED_max = 0;
     LED_min = 0;
-
-    min_limit_switch.fall(&min_limit_isr);
-    max_limit_switch.fall(&max_limit_isr);
+    led4 = 0;
 
     while(1){
         pc.write(mainMenu, sizeof(mainMenu));
@@ -132,6 +132,8 @@ void min_limit_isr(){
 }
 //option A
 void extrude(){
+    pc.set_blocking(false);
+
     pc.write(ext1, sizeof(ext1));
     ThisThread::sleep_for(500ms);
     pc.write(ext2, sizeof(ext2));
@@ -141,23 +143,22 @@ void extrude(){
     while(inputConfirmation == false){                              //while input != x or X || g_max_limit has been reached
         pc.read(input, sizeof(input));                              //read input
 
-        if(*input == 'x' || *input == 'X'){     //check for valid exit character *input == 'x' || *input == 'X' ||
+        if(*input == 'x' || *input == 'X'){                         //check for valid exit character *input == 'x' || *input == 'X' ||
             inputConfirmation = true;                               //set valid input to true
-
-        }else if(g_max_limit == 1){
+        }
+        
+        if(g_max_limit == 1){     //THIS CONDITION ISNT BEING MET
             inputConfirmation = true;
         }
     }
 
-    /* implement function to retract actuator slightly to reset switch */
-
     if(g_max_limit == 1){
-        g_max_limit = 0; 
-        LED_max = 0;                                           //reset g_max_limit flag
+        g_max_limit = 0;                                               //reset g_max_limit flag
     }
 
     motor.stop();                                                   //stop actuation
     inputConfirmation = false;                                      //reset inputConfirmation flag
+    pc.set_blocking(true);
     pc.write(ext3, sizeof(ext3));
     ThisThread::sleep_for(500ms);
 }
