@@ -4,7 +4,7 @@
 *
 *   Author:         Andrew Knowles 17/02/2023
 *   Version:        1.0
-*   Last updated:   17/02/2023
+*   Last updated:   04/04/2023
 *   MBED OS:        6.16.0
 *   MBED Studio:    v1.4.4
 */
@@ -17,6 +17,8 @@
 //rotation of shaft determined when looking at the motor from the direction of the shaft
 #define RETRACT 1
 #define EXTEND 0 
+#define MAXCYCLE 99
+#define MINCYCLE 50
 
 enum DIRECTION {
     EXTENSION,
@@ -51,10 +53,10 @@ public:
     void stop();
 
     //set the duty cycle
-    void setDutyCycle(float _duty);
+    //void setDutyCycle(unsigned short _duty);  TO BE IMPLEMENTED AT A LATER DATE
 
     //get the current duty cycle
-    float getDutyCycle();
+    int getDutyCycle();
 
 private:
     DigitalOut *_dir;

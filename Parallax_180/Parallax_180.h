@@ -1,9 +1,10 @@
 /*  Parallax_180
 *   ============
+*   Driver file for the Parallax 180 degree servo
 *
 *   Author:         Andrew Knowles 17/02/2023
 *   Version:        1.0
-*   Last updated:   17/02/2023
+*   Last updated:   04/04/2023
 *   MBED OS:        6.16.0
 *   MBED Studio:    v1.4.4
 */
