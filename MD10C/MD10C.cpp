@@ -29,7 +29,7 @@ void MD10C::init(){
     _pwm->period_us(67);        //initialise pwm frequency to 15KHz
     stop();                     //ensure the motor is off
     _dir->write(EXTEND);        //default direction
-    duty_cycle = 0.90;          //set default duty cycle to 90%
+    duty_cycle = 0.80;          //set default duty cycle to 80%
 }
 
 void MD10C::test(){
