@@ -210,8 +210,6 @@ void retractActuator(){
     ThisThread::sleep_for(500ms);               
 }
 
-//option C
-
 //option D
 void manualOperation(){
     char buffer[3] = {0};
@@ -242,7 +240,7 @@ void manualOperation(){
             pc.write(manual4, sizeof(manual4));                             //print general message
             actuator.manualMode(EXTENSION);
 
-        }else if(*input == 't' || *input == 'T'){                           //if input == t, pause actuator motion
+        }else if(*input == 't' || *input == 'T'){                           //if input == t, pause actuator motion () ||
             actuator.stop();
             pc.write(manual6, sizeof(manual6));                             //print general message
             pc.write(dutymess, sizeof(dutymess));                           //Display current duty cycle message
@@ -261,7 +259,7 @@ void manualOperation(){
             pc.write(doubleReturn, sizeof(doubleReturn));                   //print double return for asthetics
             
 
-        }else if(*input == ' ' || g_max_limit == 1 || g_min_limit == 1){                           //check for valid exit character
+        }else if(*input == ' '){                           //check for valid exit character
             inputConfirmation = true;                                       //set valid input to true
         }
 
