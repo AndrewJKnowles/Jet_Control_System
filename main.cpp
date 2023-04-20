@@ -222,7 +222,7 @@ void manualOperation(){
     while(inputConfirmation == false){                                      //while input != y or Y
         pc.read(input, sizeof(input));                                      //read input
 
-        if(*input != 'y' || *input != 'Y'){                                 //check for valid exit character
+        if(*input == 'y' || *input == 'Y'){                                 //check for valid exit character
             inputConfirmation = true;                                       //set valid input to true
         }
     }
